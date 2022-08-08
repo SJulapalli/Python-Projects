@@ -74,11 +74,12 @@ def main():
 (4) Exit""")
             pIn = int(input("What would you like to do? "))
             if pIn == 1:
-                user.move(int(input("""Which direction would you like to move? :
+                user.move(int(input("""
 (1) Left
 (2) Up
 (3) Right
-(4) Down\n""")))
+(4) Down
+Which direction would you like to move? """)))
             elif pIn == 2:
                 print("The room contains: ")
                 for object in user.currentRoom.objects:
@@ -98,7 +99,7 @@ def main():
                     user.interact(temp)
 
             elif pIn == 3:
-                print(str(user.inventory))
+                print(user.getInv())
             else:
                 end = exitRunner()
         elif state == "D":

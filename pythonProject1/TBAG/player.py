@@ -37,7 +37,7 @@ class Player:
             else:
                 self.currentRoom = self.currentRoom.down
                 print("You enter " + str(self.currentRoom.desc))
-        time.sleep(3.5)
+        time.sleep(3)
 
     def __init__(self):
         pass
@@ -57,14 +57,19 @@ class Player:
     def attack(self, target):
         target.damage(self.heldItem.dmg)
 
+    def getInv(self):
+        out = ""
+        for invItem in self.inventory:
+            out += invItem.name + ", "
+
+        return out
+
     def interact(self, target):
         target.interact()
-        print(target is object)
-        if target is object.Object:
+        if isinstance(target, object.Object):
             if target.liftable:
                 pIn = input("It looks light enough for you to lift, would you like to pick it up? (Y/N)")
                 if pIn.upper() == "Y" or pIn.upper() == "YES":
-                    print("You pick up the " + target.name)
                     if self.heldItem is object:
                         print("You set down the " + self.heldItem.name + " and pick up the " + target.name)
                         self.currentRoom.objects += [self.heldItem]
