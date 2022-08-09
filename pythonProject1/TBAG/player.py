@@ -7,10 +7,10 @@ import object
 class Player:
     name = ""
     currentRoom = room.Room()
-    inventory = list
+    inventory = []
     health = 0
     heldItem = item.Item()
-    heldItem.init("Fists", True, 10)
+    heldItem.oldSword()
 
     def move(self, direction):
         if direction == 1:  # Move left
@@ -37,7 +37,7 @@ class Player:
             else:
                 self.currentRoom = self.currentRoom.down
                 print("You enter " + str(self.currentRoom.desc))
-        time.sleep(3)
+        time.sleep(1.5)
 
     def __init__(self):
         pass
@@ -57,29 +57,49 @@ class Player:
     def attack(self, target):
         target.damage(self.heldItem.dmg)
 
+    # Returns a string containing a list of the player's items and heldItem
     def getInv(self):
-        out = ""
+        print("---------------------------------------------------------------------------------------------------")
+        out = "        Inventory\n["
         for invItem in self.inventory:
             out += invItem.name + ", "
 
-        return out
+        return out + "]\nHeld Item: " + self.heldItem.name
 
+    # Interacts with a given target. If the target is an object/item, it will have an additional custom interaction
     def interact(self, target):
         target.interact()
         if isinstance(target, object.Object):
-            if target.liftable:
-                pIn = input("It looks light enough for you to lift, would you like to pick it up? (Y/N)")
-                if pIn.upper() == "Y" or pIn.upper() == "YES":
-                    if self.heldItem is object:
-                        print("You set down the " + self.heldItem.name + " and pick up the " + target.name)
-                        self.currentRoom.objects += [self.heldItem]
-                        self.heldItem = target
-                        self.currentRoom.objects.remove(target)
-                    else:
-                        print("You put away the " + self.heldItem.name + " and pick up the " + target.name)
-                        self.inventory = self.inventory + [self.heldItem]
+            self.interactObject(target)
+        elif isinstance(target, item.Item):
+            self.interactItem(target)
+
+
+    def interactObject(self, target):
+        if target.liftable:
+            pIn = input("It looks light enough for you to lift, would you like to pick it up? (Y/N): ")
+            if pIn.upper() == "Y" or pIn.upper() == "YES":
+                if isinstance(self.heldItem, object.Object):
+                    print("You set down the " + self.heldItem.name + " and pick up the " + target.name)
+                    self.currentRoom.objects.append(object.Object(self.heldItem))
                     self.heldItem = target
-                    self.currentRoom.objects.remove(target)
+                    self.currentRoom.objects.remove(object.Object(target))
+                else:
+                    print("You put away the " + self.heldItem.name + " and pick up the " + target.name)
+                    self.inventory.append(self.heldItem)
+                self.heldItem = target
+                self.currentRoom.objects.remove(target)
+        else:
+            print("It looks too heavy for you to lift")
+
+    def interactItem(self, target):
+        print("You pick up the " + target.name)
+        if target.equippable:
+            pIn = input("Would you like to equip it (Y/N)? ")
+            if pIn.upper() == "Y" or pIn.upper() == "YES":
+                self.inventory.append(self.heldItem)
+                self.heldItem = target
             else:
-                print("It looks to heavy for you to lift")
+                self.inventory.append(target)
+        self.currentRoom.items.remove(target)
 

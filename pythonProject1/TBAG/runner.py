@@ -2,8 +2,8 @@ import room
 import player
 import time
 
-# Main Menu, Navigation, Dialogue, Combat
-States = {"MM", "N", "D", "C"}
+# Main Menu, Navigation, Dialogue, Combat, Inventory
+States = {"MM", "N", "D", "C", "I"}
 state = "MM"
 end = False
 firstRoom = None
@@ -74,13 +74,14 @@ def main():
 (4) Exit""")
             pIn = int(input("What would you like to do? "))
             if pIn == 1:
-                user.move(int(input("""
+                user.move(int(input("""---------------------------------------------------------------------------------------------------
 (1) Left
 (2) Up
 (3) Right
 (4) Down
 Which direction would you like to move? """)))
             elif pIn == 2:
+                print("---------------------------------------------------------------------------------------------------")
                 print("The room contains: ")
                 for object in user.currentRoom.objects:
                     print(object.name + ", ")
@@ -99,13 +100,18 @@ Which direction would you like to move? """)))
                     user.interact(temp)
 
             elif pIn == 3:
-                print(user.getInv())
+                state = "I"
             else:
                 end = exitRunner()
-        elif state == "D":
+        elif state == "D":  # Dialogue
             print("Dialogue")
-        elif state == "C":
+        elif state == "C":  # Combat
             print("Combat")
+        elif state == "I":  # Incomplete
+            print(user.getInv())
+            pIn = input("Enter the name of the item you want to interact with or 'exit' to go back: ")
+            if pIn == "exit":
+                state = "N"
         else:
             end = mainMenu()
 
