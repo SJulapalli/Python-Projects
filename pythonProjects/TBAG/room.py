@@ -36,7 +36,12 @@ class Room:
     def initStudy(self, u, l, r, d):
         self.initEmpty(u, l, r, d)
         self.desc = "a small study. There are bookshelves along the walls, and near the back lies a desk.";
-        self.objects = [object.Object().desk(), object.Object().bookShelf()]
+
+        desk = object.Object()
+        desk.initDesk()
+
+        self.objects = [desk]
+
 
     def getDesc(self):
         return self.desc
