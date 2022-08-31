@@ -47,6 +47,6 @@ class Object:
     #  Handles interaction between the player and an object
     def interact(self):
         print("You walk up to the " + self.name)
-        time.sleep(1)
+        time.sleep(.75)
         print(self.desc)
-        time.sleep(3)
+        time.sleep(1.5)

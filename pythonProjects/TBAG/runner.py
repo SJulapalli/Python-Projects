@@ -18,7 +18,7 @@ def initmap():
     five = room.Room()
 
     one.initEmpty(None, None, None, None)
-    two.initStudy(None, one, None, None)
+    two.study(None, one, None, None)
     three.initCustom("Room Three", None, None, None, None, None, None, one, None)
     four.initCustom("Room Four", None, None, None, None, None, None, None, one)
     five.initCustom("Room Five", None, None, None, None, None, one, None, None)
@@ -58,6 +58,112 @@ def exitRunner():
         return False
 
 
+def combatHandler():
+    global state, end, user
+    enemies = user
+    while user.health > 0 or len(user.currentRoom.enemies) > 0:
+        print("")
+
+
+def movementHandler():
+    global state, end, user
+
+    state = user.move(int(input("""---------------------------------------------------------------------------------------------------
+            Directions
+    (1) Left
+    (2) Up
+    (3) Right
+    (4) Down
+    Which direction would you like to move? """)))
+
+
+def interactionHandler():
+    global state, end, user
+    print("---------------------------------------------------------------------------------------------------")
+    print("The room contains the following\nObjects: ")
+    if len(user.currentRoom.objects) == 0:      # Objects in the room
+        print("   None")
+        time.sleep(.25)
+    else:
+        for obj in user.currentRoom.objects:
+            print("   - " + obj.name)
+            time.sleep(.25)
+
+    print("Items: ")
+    if len(user.currentRoom.items) == 0:        # Items in the room
+        print("   None")
+        time.sleep(.25)
+    else:
+        for item in user.currentRoom.items:
+            print("   - " + item.name)
+            time.sleep(.25)
+
+    print("People: ")
+    if len(user.currentRoom.friendlies) == 0:   # Friendly NPCs in the room
+        print("   None")
+        time.sleep(.25)
+    else:
+        for NPC in user.currentRoom.friendlies:
+            print("   - " + NPC.name)
+            time.sleep(.25)
+
+    exit = False
+    while not exit:
+        pIn = input("What would you like to interact with? Type 'exit' if you'd like to go back ")
+
+        if pIn.upper() == "EXIT":
+            exit = True
+        else:
+            temp = None
+            for object in user.currentRoom.objects:
+                if object.name == pIn:
+                    temp = object
+
+            if temp is None:
+                for item in user.currentRoom.items:
+                    if item.name == pIn:
+                        temp = item
+
+            if temp is None:
+                for NPC in user.currentRoom.friendlies:
+                    if NPC.name == pIn:
+                        temp = NPC
+
+            if temp is None:
+                print("There is nothing in the room with that name")
+                time.sleep(1)
+            else:
+                exit = True
+                user.interact(temp)
+
+
+def inventoryHandler():
+    global state, end, user
+    user.getInv()
+    pIn = input("Enter the name of the item you want to interact with or 'exit' to go back: ")
+    if pIn == "exit":
+        state = "N"
+
+
+def navigationHandler():
+    global state, end, user
+    print("""---------------------------------------------------------------------------------------------------
+        Actions
+(1) Move
+(2) Interact
+(3) Open Inventory
+(4) Exit""")
+    pIn = int(input("What would you like to do? "))
+    if pIn == 1:  # Move
+        movementHandler()
+    elif pIn == 2:  # Interact
+        interactionHandler()
+    elif pIn == 3:  # Inventory
+        state = "I"
+    else:  # Exit
+        end = exitRunner()
+
+
 def main():
     global end, state, firstRoom, user
 
@@ -65,54 +171,15 @@ def main():
     user = initplayer("Suhas", firstRoom, [], 100, 0)
 
     while not end:
-        if state == "N":
-            print("""---------------------------------------------------------------------------------------------------
-        Actions
-(1) Move
-(2) Interact
-(3) Open Inventory
-(4) Exit""")
-            pIn = int(input("What would you like to do? "))
-            if pIn == 1:
-                user.move(int(input("""---------------------------------------------------------------------------------------------------
-(1) Left
-(2) Up
-(3) Right
-(4) Down
-Which direction would you like to move? """)))
-            elif pIn == 2:
-                print("---------------------------------------------------------------------------------------------------")
-                print("The room contains: ")
-                for object in user.currentRoom.objects:
-                    print(object.name + ", ")
-                    time.sleep(.5)
-
-                pIn = input("What would you like to interact with? ")
-
-                temp = None
-                for object in user.currentRoom.objects:
-                    if object.name == pIn:
-                        temp = object
-
-                if temp is None:
-                    print("There is no object with that name in the room.")
-                else:
-                    user.interact(temp)
-
-            elif pIn == 3:
-                state = "I"
-            else:
-                end = exitRunner()
+        if state == "N":            # Navigation
+            navigationHandler()
         elif state == "D":  # Dialogue
             print("Dialogue")
         elif state == "C":  # Combat
             print("Combat")
-        elif state == "I":  # Incomplete
-            print(user.getInv())
-            pIn = input("Enter the name of the item you want to interact with or 'exit' to go back: ")
-            if pIn == "exit":
-                state = "N"
-        else:
+        elif state == "I":  # Inventory
+            inventoryHandler()
+        else:               # End
             end = mainMenu()
 
             if not end:

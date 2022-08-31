@@ -1,4 +1,5 @@
 import object
+import item
 
 class Room:
     up = "Wall"
@@ -33,14 +34,12 @@ class Room:
         self. enemies = enemyList
         self.friendlies = friendlyList
 
-    def initStudy(self, u, l, r, d):
+    def study(self, u, l, r, d):
         self.initEmpty(u, l, r, d)
         self.desc = "a small study. There are bookshelves along the walls, and near the back lies a desk.";
 
-        desk = object.Object()
-        desk.initDesk()
-
-        self.objects = [desk]
+        self.objects = [object.Object().desk(), object.Object().bookShelf()]
+        self.items = [item.Item().oldSword(), item.Item().oldSword(), item.Item().oldSword()]
 
 
     def getDesc(self):
